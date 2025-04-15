@@ -2,10 +2,13 @@
 #include "CircuitManager.h"
 #include "StaticGateLibrary.h"
 
+#include "SFML/Graphics.hpp"
+#include "SFML/Window.hpp"
+
 
 
 int main() {
-	
+	sf::RenderWindow window(sf::VideoMode({ 200, 200 }), "SFML works!");
 	return 0;
 }
 
