@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CircuitManager.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="GateStore.cpp" />
     <ClCompile Include="main.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="WireStore.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CircuitManager.h" />
     <ClInclude Include="Gate.h" />
     <ClInclude Include="GateStore.h" />
     <ClInclude Include="PrimitiveGate.h" />

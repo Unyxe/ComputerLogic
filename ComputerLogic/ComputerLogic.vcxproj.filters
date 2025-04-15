@@ -36,6 +36,9 @@
     <ClCompile Include="WireStore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CircuitManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gate.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WireStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CircuitManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,7 +5,7 @@
 PrimitiveGate::PrimitiveGate(int gateType)
 {
 	if (gateType > 5 || gateType < 0) throw std::invalid_argument("Invalid primitive gate type. Must be between 0 and 5.");
-	gateTypeId = gateType;
+	ChangeTypeID(gateType);
 	numberOfOutputs = 1;
 	if (gateType != 2) {
 		numberOfInputs = 2;
@@ -13,15 +13,19 @@ PrimitiveGate::PrimitiveGate(int gateType)
 	else {
 		numberOfInputs = 1;
 	}
+
+	for (int i = 0; i < numberOfOutputs; i++) {
+		lastOutput.push_back(false);
+	}
 }
 
-std::vector<bool> PrimitiveGate::Evaluate(std::vector<bool> input)
+std::vector<bool> PrimitiveGate::Evaluate(const std::vector<bool>& input)
 {
 	if (input.size() != numberOfInputs) {
 		throw std::invalid_argument("Input size does not match the number of inputs for this gate.");
 	}
 	std::vector<bool> output(numberOfOutputs, false);
-	switch (gateTypeId) {
+	switch (GetTypeID()) {
 		case 0: // AND
 			output[0] = input[0] && input[1];
 			break;
@@ -41,5 +45,7 @@ std::vector<bool> PrimitiveGate::Evaluate(std::vector<bool> input)
 			output[0] = input[0] ^ input[1];
 			break;
 	}
+
+	lastOutput = output;
 	return output;
 }

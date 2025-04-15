@@ -1,29 +1,31 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
+#include <memory>
 #include <random>
+#include <vector>
 
 #include "Gate.h"
-#include "StaticGateLibrary.h"
 
 class GateStore
 {
 private:
-	std::map<int, Gate> GateMap;
+	std::unordered_map<int, std::unique_ptr<Gate>> GateMap;
 
 public:
 	GateStore() = default;
+	~GateStore();
 
-	void EmplaceGate() {
-		int gateTypeId = std::rand();
-		GateMap[gateTypeId] = Gate::Deserialize(StaticGateLibrary::GetGateType(gateTypeId));
-	}
+	int EmplaceGate(int gateTypeId);
+	int EmplaceGate(int gateTypeId, int gateId);
+	void RemoveGate(int gateId);
 
-	std::vector<bool> EvaluateGate(int gateTypeId, std::vector<bool> input) {
-		if (GateMap.find(gateTypeId) == GateMap.end()) {
-			throw std::invalid_argument("Gate type not found in store.");
-		}
-		return GateMap[gateTypeId].Evaluate(input);
-	}
+	std::vector<int> GetAllGateIds() const;
+
+	std::vector<bool> EvaluateGate(int gateId, const std::vector<bool>& input);
+	std::vector<bool> GetLastOutput(int gateId) const;
+	int GetNumberOfInputs(int gateId) const;
+
+	std::string SerializeGates() const;
 };
 
