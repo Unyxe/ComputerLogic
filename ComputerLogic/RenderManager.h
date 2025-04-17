@@ -10,6 +10,10 @@
 class RenderManager
 {
 private:
+	const int WINDOW_WIDTH = 1920;
+	const int WINDOW_HEIGHT = 1080;
+
+
 	sf::RenderWindow renderWindow;
 
 	CircuitRenderData currentRenderData;
@@ -23,6 +27,8 @@ private:
 
 	void pollEvents();
 	void Draw();
+
+	void DrawBackground();
 
 	const std::vector<std::vector<int>> SplitVector(const std::vector<int>& vector, int subSize) const;
 

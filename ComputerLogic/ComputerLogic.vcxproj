@@ -148,6 +148,7 @@
     <ClCompile Include="CircuitRenderData.cpp" />
     <ClCompile Include="DrawableGate.cpp" />
     <ClCompile Include="DrawableWire.cpp" />
+    <ClCompile Include="DrawingHelper.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="GateMetaData.cpp" />
     <ClCompile Include="GateStore.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="CircuitRenderData.h" />
     <ClInclude Include="DrawableGate.h" />
     <ClInclude Include="DrawableWire.h" />
+    <ClInclude Include="DrawingHelper.h" />
     <ClInclude Include="Gate.h" />
     <ClInclude Include="GateMetaData.h" />
     <ClInclude Include="GateStore.h" />

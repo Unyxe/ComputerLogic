@@ -14,4 +14,11 @@ DrawableWire::DrawableWire(int wireId, bool state)
 
 void DrawableWire::Draw(sf::RenderWindow& window) const
 {
+	//draw wire with width and color
+	sf::VertexArray line(sf::PrimitiveType::Lines, 2);
+	line[0].position = position1;
+	line[0].color = state ? wireActiveColor : wireInactiveColor;
+	line[1].position = position2;
+	line[1].color = state ? wireActiveColor : wireInactiveColor;
+	window.draw(line);
 }

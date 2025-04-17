@@ -1,6 +1,9 @@
 #include "RenderManager.h"
 
+#include <iostream>
+
 #include "StaticGateLibrary.h"
+#include "DrawingHelper.h";
 
 void RenderManager::pollEvents()
 {
@@ -13,6 +16,28 @@ void RenderManager::pollEvents()
 void RenderManager::Draw()
 {
 
+	DrawBackground();
+
+	for (auto& drawableWire : drawableWireMap) {
+		drawableWire.second->Draw(renderWindow);
+	}
+
+	for (int i = 0; i < currentRenderData.GetNumberOfInputs(); i++) {
+		DrawingHelper::DrawStateCircle(renderWindow, inputPositions[i], false);
+	}
+
+	for (int i = 0; i < currentRenderData.GetNumberOfOutputs(); i++) {
+		DrawingHelper::DrawStateCircle(renderWindow, outputPositions[i], false);
+	}
+
+	for (auto& drawableGate : drawableGateMap) {
+		drawableGate.second->Draw(renderWindow);
+	}
+}
+
+void RenderManager::DrawBackground()
+{
+	//TODO
 }
 
 const std::vector<std::vector<int>> RenderManager::SplitVector(const std::vector<int>& vector, int subSize) const
@@ -40,11 +65,15 @@ void RenderManager::PopulateDrawables()
 	outputPositions.clear();
 	inputPositions.clear();
 
-	for (int i = 0; i < currentRenderData.GetNumberOfInputs(); i++) {
-		inputPositions.push_back({ (float)(i * 100 + 50), 50.0f });
+
+	int inputCount = currentRenderData.GetNumberOfInputs();
+	int outputCount = currentRenderData.GetNumberOfOutputs();
+
+	for (int i = 0; i < inputCount; i++) {
+		inputPositions.push_back({ 50.f, 50.f + (WINDOW_HEIGHT-100.f)*(i+1)/(inputCount+1)});
 	}
-	for (int i = 0; i < currentRenderData.GetNumberOfOutputs(); i++) {
-		outputPositions.push_back({ (float)(i * 100 + 50), 550.0f });
+	for (int i = 0; i < outputCount; i++) {
+		outputPositions.push_back({ WINDOW_WIDTH - 50.f, 50.f + (WINDOW_HEIGHT - 100.f) * (i+1) / (outputCount+1) });
 	}
 
 	for (const auto& gateData : SplitVector(currentRenderData.GetSequentialGateData(), 6))
@@ -94,9 +123,15 @@ void RenderManager::PopulateDrawables()
 RenderManager::RenderManager(const CircuitRenderData& initialData)
 {
 	currentRenderData = initialData;
+
+	sf::Vector2u size; 
+	size.x = WINDOW_WIDTH;
+	size.y = WINDOW_HEIGHT;
+
 	renderWindow = sf::RenderWindow(
-		sf::VideoMode({ 800, 600 }),
-		"Computer Logic Simulator"
+		sf::VideoMode(size),
+		"Computer Logic Simulator",
+		sf::Style::Titlebar | sf::Style::Close
 	);
 
 	PopulateDrawables();
@@ -113,8 +148,10 @@ void RenderManager::StartDrawing()
 	{
 		pollEvents();
 
+		renderWindow.clear(sf::Color::Color(45,45,45));
+
 		Draw();
 
-		renderWindow.clear(sf::Color::Black);
+		renderWindow.display();
 	}
 }
