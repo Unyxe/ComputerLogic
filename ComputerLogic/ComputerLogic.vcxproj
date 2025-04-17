@@ -143,9 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ApplicationManager.cpp" />
     <ClCompile Include="CircuitManager.cpp" />
+    <ClCompile Include="CircuitRenderData.cpp" />
     <ClCompile Include="DrawableGate.cpp" />
+    <ClCompile Include="DrawableWire.cpp" />
     <ClCompile Include="Gate.cpp" />
+    <ClCompile Include="GateMetaData.cpp" />
     <ClCompile Include="GateStore.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PrimitiveGate.cpp" />
@@ -155,9 +159,13 @@
     <ClCompile Include="WireStore.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApplicationManager.h" />
     <ClInclude Include="CircuitManager.h" />
+    <ClInclude Include="CircuitRenderData.h" />
     <ClInclude Include="DrawableGate.h" />
+    <ClInclude Include="DrawableWire.h" />
     <ClInclude Include="Gate.h" />
+    <ClInclude Include="GateMetaData.h" />
     <ClInclude Include="GateStore.h" />
     <ClInclude Include="PrimitiveGate.h" />
     <ClInclude Include="RenderManager.h" />

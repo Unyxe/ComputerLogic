@@ -1,6 +1,8 @@
 #include "Gate.h"
+#include "GateMetaData.h"
 #include "GateStore.h"
 #include "PrimitiveGate.h"
+#include "StaticGateLibrary.h"
 #include <string>
 
 Gate::Gate()
@@ -21,91 +23,20 @@ Gate::Gate(std::string_view serializedGate)
 	gateStore = std::make_unique<GateStore>();
 	wireStore = std::make_unique<WireStore>();
 
-	std::string chunk = "";
-	std::vector<std::string> chunks;
-	bool flagOpen= false;
-	for (int i = 1; i < (int)serializedGate.size(); i++) {
-		char c = serializedGate[i];
-		if (c == '[') {
-			flagOpen = true;
-			continue;
-		}
-		else if (c == ']') {
-			flagOpen = false;
-			chunks.push_back(chunk);
-			chunk = "";
-			continue;
-		}
-		else {
-			chunk += c;
-		}
-	}
-	for (int i = 0; i < (int)chunks.size(); i++) {
-		std::vector<std::string> subchunks;
-		for (int j = 0; j < (int)chunks[i].size(); j++) {
-			char c = chunks[i][j];
-			if (c == '{') {
-				flagOpen = true;
-				continue;
-			}
-			else if (c == '}') {
-				flagOpen = false;
-				subchunks.push_back(chunk);
-				chunk = "";
-				continue;
-			}
-			else{
-				chunk += c;
-			}
-		}
-		for (int j = 0; j < (int)subchunks.size(); j++) {
-			std::vector<int> data;
-			for (int k = 0; k < (int)subchunks[j].size(); k++) {
-				char c = subchunks[j][k];
-				if (c == ',') {
-					data.push_back(std::stoi(chunk));
-					chunk = "";
-					continue;
-				}
-				else {
-					chunk += c;
-				}
-			}
+	std::vector<int> data = StaticGateLibrary::DeserializeIntVector(serializedGate);
 
-			switch (i)
-			{
-			case 0:
-				typeID = data[0];
-				break;
-			case 1:
-				if (j == 0) {
-					numberOfInputs = data[0];
-				}
-				else {
-					numberOfOutputs = data[0];
-				}
-				break;
-			case 2:
-				if (j == 0) {
-					inputsID = data[0];
-				}
-				else {
-					outputsID = data[0];
-				}
-				break;
-			case 3:
-				gateStore->EmplaceGate(data[0], data[1]);
-				break;
-			case 4:
-				wireStore->EmplaceWire(data[0], data[1], data[2], data[3]);
-				break;
-			}
-		}
-	}
+	typeID = data[0];
+	numberOfInputs = data[1];
+	numberOfOutputs = data[2];
+	inputsID = data[3];
+	outputsID = data[4];
 
 	for (int i = 0; i < numberOfOutputs; i++) {
 		lastOutput.push_back(false);
 	}
+
+	int index = gateStore->OverwriteGatesByParsed(data, 5);
+	wireStore->OverwriteWiresByParsed(data, index);
 }
 
 Gate::~Gate() = default;

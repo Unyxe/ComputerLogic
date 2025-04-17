@@ -1,5 +1,8 @@
 #include "CircuitManager.h"
 
+#include "GateMetaData.h"
+#include "StaticGateLibrary.h"
+
 #include <sstream>
 #include <iostream>
 
@@ -50,13 +53,15 @@ void CircuitManager::Update()
 
 int CircuitManager::EmplaceGate(int gateTypeId)
 {
-	int gateId = gateStore->EmplaceGate(gateTypeId);
+	GateMetaData metaData(0.0f, 0.0f); // Placeholder for gate position
+	int gateId = gateStore->EmplaceGate(gateTypeId, metaData);
 	return gateId;
 }
 
 int CircuitManager::EmplaceGate(int gateTypeId, int gateId)
 {
-	gateStore->EmplaceGate(gateTypeId, gateId);
+	GateMetaData metaData(0.0f, 0.0f); // Placeholder for gate position
+	gateStore->EmplaceGate(gateTypeId, gateId, metaData);
 	return gateId;
 }
 
@@ -77,12 +82,12 @@ void CircuitManager::RemoveWire(int objId1, int objId2, int index1, int index2)
 	wireStore->RemoveWire(objId1, objId2, index1, index2);
 }
 
-const std::vector<int>& CircuitManager::GetGatesData() const
+const std::vector<int> CircuitManager::GetGatesData() const
 {
 	return gateStore->GetGatesData();
 }
 
-const std::vector<int>& CircuitManager::GetWiresData() const
+const std::vector<int> CircuitManager::GetWiresData() const
 {
 	return wireStore->GetWiresData();
 }
@@ -108,91 +113,22 @@ void CircuitManager::LoadCircuit(std::string_view serializedCircuit)
 {
 	ClearCircuit(0, 0);
 
-	std::string chunk = "";
-	std::vector<std::string> chunks;
-	bool flagOpen = false;
-	for (int i = 1; i < (int)serializedCircuit.size(); i++) {
-		char c = serializedCircuit[i];
-		if (c == '[') {
-			flagOpen = true;
-			continue;
-		}
-		else if (c == ']') {
-			flagOpen = false;
-			chunks.push_back(chunk);
-			chunk = "";
-			continue;
-		}
-		else {
-			chunk += c;
-		}
-	}
-	for (int i = 0; i < (int)chunks.size(); i++) {
-		std::vector<std::string> subchunks;
-		for (int j = 0; j < (int)chunks[i].size(); j++) {
-			char c = chunks[i][j];
-			if (c == '{') {
-				flagOpen = true;
-				continue;
-			}
-			else if (c == '}') {
-				flagOpen = false;
-				subchunks.push_back(chunk);
-				chunk = "";
-				continue;
-			}
-			else {
-				chunk += c;
-			}
-		}
-		for (int j = 0; j < (int)subchunks.size(); j++) {
-			std::vector<int> data;
-			for (int k = 0; k < (int)subchunks[j].size(); k++) {
-				char c = subchunks[j][k];
-				if (c == ',') {
-					data.push_back(std::stoi(chunk));
-					chunk = "";
-					continue;
-				}
-				else {
-					chunk += c;
-				}
-			}
+	std::vector<int> data = StaticGateLibrary::DeserializeIntVector(serializedCircuit);
 
-			switch (i)
-			{
-			case 0:
-				typeID = data[0];
-				break;
-			case 1:
-				if (j == 0) {
-					for (int i = 0; i < data[0]; i++) {
-						inputStates.push_back(false);
-					}
-				}
-				else {
-					for (int i = 0; i < data[0]; i++) {
-						outputStates.push_back(false);
-					}
-				}
-				break;
-			case 2:
-				if (j == 0) {
-					inputsID = data[0];
-				}
-				else {
-					outputsID = data[0];
-				}
-				break;
-			case 3:
-				gateStore->EmplaceGate(data[0], data[1]);
-				break;
-			case 4:
-				wireStore->EmplaceWire(data[0], data[1], data[2], data[3]);
-				break;
-			}
-		}
+	typeID = data[0];
+	int numberOfInputs = data[1];
+	int numberOfOutputs = data[2];
+	inputsID = data[3];
+	outputsID = data[4];
+	for (int i = 0; i < numberOfInputs; i++) {
+		inputStates.push_back(false);
 	}
+	for (int i = 0; i < numberOfOutputs; i++) {
+		outputStates.push_back(false);
+	}
+
+	int index = gateStore->OverwriteGatesByParsed(data, 5);
+	wireStore->OverwriteWiresByParsed(data, index);
 }
 
 void CircuitManager::GenerateTruthTable(int substepCount)
@@ -221,11 +157,17 @@ void CircuitManager::GenerateTruthTable(int substepCount)
 
 std::string CircuitManager::SerializeGate()
 {  
-  std::stringstream serializedGate;
 
-  serializedGate << "1[{" << typeID << ",}][{"<<inputStates.size()<<",}{"<<outputStates.size()<< ",}][{" << inputsID << ",}{" << outputsID << ",}]";
-  serializedGate << gateStore->SerializeGates();
-  serializedGate << wireStore->SerializeWires();
+	std::vector<int> data;
 
-  return serializedGate.str();
+	data.push_back(typeID);
+	data.push_back(static_cast<int>(inputStates.size()));
+	data.push_back(static_cast<int>(outputStates.size()));
+	data.push_back(inputsID);
+	data.push_back(outputsID);
+
+	std::string serializedData = StaticGateLibrary::SerializeIntVector(data);
+
+	std::string serializedGate = serializedData +"," + gateStore->SerializeGates()+"," + wireStore->SerializeWires();
+	return serializedGate;
 }

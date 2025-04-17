@@ -1,5 +1,7 @@
 #include "WireStore.h"
 
+#include "StaticGateLibrary.h"
+
 #include <sstream>
 
 int WireStore::EmplaceWire(int objId1, int objId2, int index1, int index2)
@@ -50,18 +52,23 @@ void WireStore::SetWiresStateByInput(int inputObjectID, int index, bool state)
 
 std::string WireStore::SerializeWires() const
 {
-	std::stringstream serializedWires;
+	std::vector<int> data;
 
-	serializedWires << "[";
+	data.push_back(static_cast<int>(wireMap.size()));
+	data.push_back(5); // Assuming 6 is the number of attributes for each wire
+
 	for (const auto& wire : wireMap) {
-		serializedWires << "{" << wire.second->GetObjId1() << "," << wire.second->GetObjId2() << "," << wire.second->GetIndex1() << "," << wire.second->GetIndex2() << ",}";
+		data.push_back(wire.first);
+		data.push_back(wire.second->GetObjId1());
+		data.push_back(wire.second->GetObjId2());
+		data.push_back(wire.second->GetIndex1());
+		data.push_back(wire.second->GetIndex2());
 	}
-	serializedWires << "]";
 
-	return serializedWires.str();
+	return StaticGateLibrary::SerializeIntVector(data);
 }
 
-const std::vector<int>& WireStore::GetWiresData() const
+const std::vector<int> WireStore::GetWiresData() const
 {
 	std::vector<int> sequentialData;
 	for (const auto& wire : wireMap) {
@@ -73,4 +80,20 @@ const std::vector<int>& WireStore::GetWiresData() const
 		sequentialData.push_back(wire.second->GetIndex2());
 	}
 	return sequentialData;
+}
+
+std::vector<int> WireStore::OverwriteWiresByParsed(std::vector<int> data, int start)
+{
+	wireMap.clear();
+	int numberOfWires = data[start++];
+	int numberOfAttributes = data[start++];
+	for (int i = 0; i < numberOfWires; i++) {
+		int wireId = data[start++];
+		int objId1 = data[start++];
+		int objId2 = data[start++];
+		int index1 = data[start++];
+		int index2 = data[start++];
+		EmplaceWire(objId1, objId2, index1, index2);
+	}
+	return data;
 }

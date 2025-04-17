@@ -8,13 +8,13 @@
 
 GateStore::~GateStore() = default;
 
-int GateStore::EmplaceGate(int gateTypeId)
+int GateStore::EmplaceGate(int gateTypeId, const GateMetaData& metaData)
 {
 	int gateId = std::rand() * 10000 + rand();
-	return EmplaceGate(gateTypeId, gateId);
+	return EmplaceGate(gateId, gateTypeId, metaData);
 }
 
-int GateStore::EmplaceGate(int gateTypeId, int gateId)
+int GateStore::EmplaceGate(int gateId, int gateTypeId, const GateMetaData& metaData)
 {
 	std::string_view serializedGate = StaticGateLibrary::GetGateType(gateTypeId);
 	if (StaticGateLibrary::isPrimitive(serializedGate)) {
@@ -23,6 +23,7 @@ int GateStore::EmplaceGate(int gateTypeId, int gateId)
 	else {
 		gateMap[gateId] = std::make_unique<Gate>(serializedGate);
 	}
+	gateMetaDataMap[gateId] = std::make_unique<GateMetaData>(metaData);
 	return gateId;
 }
 
@@ -30,13 +31,14 @@ void GateStore::RemoveGate(int gateId)
 {
 	if (gateMap.find(gateId) != gateMap.end()) {
 		gateMap.erase(gateId);
+		gateMetaDataMap.erase(gateId);
 	}
 	else {
 		throw std::invalid_argument("Gate ID not found in store.");
 	}
 }
 
-const std::vector<int>& GateStore::GetAllGateIds() const
+const std::vector<int> GateStore::GetAllGateIds() const
 {
 	std::vector<int> gateIds;
 	for (const auto& pair : gateMap) {
@@ -75,20 +77,51 @@ int GateStore::GetNumberOfInputs(int gateId) const
 
 std::string GateStore::SerializeGates() const
 {
-	std::stringstream serializedGates;
+	std::vector<int> data;
 
-	serializedGates << "[";
+	data.push_back(static_cast<int>(gateMap.size()));
+	data.push_back(2); // Assuming 2 is the number of attributes for each gate
+
 	for (const auto& pair : gateMap) {
 		int gateId = pair.first;
 		int gateTypeId = pair.second->GetTypeID();
-		serializedGates <<"{" << gateTypeId << "," << gateId << ",}";
-	}
-	serializedGates << "]";
+		data.push_back(gateId);
+		data.push_back(gateTypeId);
 
-	return serializedGates.str();
+		std::vector<int> metaData = gateMetaDataMap.at(gateId)->GetData();
+		data.push_back(static_cast<int>(metaData.size()));
+		data.insert(data.end(), metaData.begin(), metaData.end());
+	}
+
+	return StaticGateLibrary::SerializeIntVector(data);
 }
 
-const std::vector<int>& GateStore::GetGatesData() const
+int GateStore::OverwriteGatesByParsed(std::vector<int> data, int start)
+{
+	for (auto& pair : gateMap) {
+		pair.second.reset();
+	}
+	gateMap.clear();
+
+	for (auto& pair : gateMetaDataMap) {
+		pair.second.reset();
+	}
+	gateMetaDataMap.clear();
+	int numberOfGates = data[start++];
+	int numberOfAttributes = data[start++];
+	for (int i = 0; i < numberOfGates; i++) {
+		int gateId = data[start++];
+		int gateTypeId = data[start++];
+		
+		GateMetaData tempMetaData;
+		start = tempMetaData.UpdateFromData(data, start);
+
+		EmplaceGate(gateId, gateTypeId, tempMetaData);
+	}
+	return start;
+}
+
+const std::vector<int> GateStore::GetGatesData() const
 {
 	std::vector<int> sequentialData;
 	for (const auto& pair : gateMap) {
@@ -96,6 +129,9 @@ const std::vector<int>& GateStore::GetGatesData() const
 		sequentialData.push_back(pair.second->GetTypeID());
 		sequentialData.push_back(pair.second->GetNumberOfInputs());
 		sequentialData.push_back((int)pair.second->GetLastOutput().size());
+		auto& metaData = gateMetaDataMap.at(pair.first)->GetData();
+		sequentialData.push_back(metaData[0]);
+		sequentialData.push_back(metaData[1]);
 	}
 	return sequentialData;
 }
