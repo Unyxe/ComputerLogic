@@ -18,28 +18,28 @@ int GateStore::EmplaceGate(int gateTypeId, int gateId)
 {
 	std::string_view serializedGate = StaticGateLibrary::GetGateType(gateTypeId);
 	if (StaticGateLibrary::isPrimitive(serializedGate)) {
-		GateMap[gateId] = std::make_unique<PrimitiveGate>(gateTypeId);
+		gateMap[gateId] = std::make_unique<PrimitiveGate>(gateTypeId);
 	}
 	else {
-		GateMap[gateId] = std::make_unique<Gate>(serializedGate);
+		gateMap[gateId] = std::make_unique<Gate>(serializedGate);
 	}
 	return gateId;
 }
 
 void GateStore::RemoveGate(int gateId)
 {
-	if (GateMap.find(gateId) != GateMap.end()) {
-		GateMap.erase(gateId);
+	if (gateMap.find(gateId) != gateMap.end()) {
+		gateMap.erase(gateId);
 	}
 	else {
 		throw std::invalid_argument("Gate ID not found in store.");
 	}
 }
 
-std::vector<int> GateStore::GetAllGateIds() const
+const std::vector<int>& GateStore::GetAllGateIds() const
 {
 	std::vector<int> gateIds;
-	for (const auto& pair : GateMap) {
+	for (const auto& pair : gateMap) {
 		gateIds.push_back(pair.first);
 	}
 	return gateIds;
@@ -47,16 +47,16 @@ std::vector<int> GateStore::GetAllGateIds() const
 
 std::vector<bool> GateStore::EvaluateGate(int gateId, const std::vector<bool>& input)
 {
-	if (GateMap.find(gateId) == GateMap.end()) {
+	if (gateMap.find(gateId) == gateMap.end()) {
 		throw std::invalid_argument("Gate ID not found in store.");
 	}
-	return GateMap[gateId]->Evaluate(input);
+	return gateMap[gateId]->Evaluate(input);
 }
 
 std::vector<bool> GateStore::GetLastOutput(int gateId) const
 {
-	if (GateMap.find(gateId) != GateMap.end()) {
-		return GateMap.at(gateId)->GetLastOutput();
+	if (gateMap.find(gateId) != gateMap.end()) {
+		return gateMap.at(gateId)->GetLastOutput();
 	}
 	else {
 		throw std::invalid_argument("Gate ID not found in store.");
@@ -65,8 +65,8 @@ std::vector<bool> GateStore::GetLastOutput(int gateId) const
 
 int GateStore::GetNumberOfInputs(int gateId) const
 {
-	if (GateMap.find(gateId) != GateMap.end()) {
-		return GateMap.at(gateId)->GetNumberOfInputs();
+	if (gateMap.find(gateId) != gateMap.end()) {
+		return gateMap.at(gateId)->GetNumberOfInputs();
 	}
 	else {
 		throw std::invalid_argument("Gate ID not found in store.");
@@ -78,7 +78,7 @@ std::string GateStore::SerializeGates() const
 	std::stringstream serializedGates;
 
 	serializedGates << "[";
-	for (const auto& pair : GateMap) {
+	for (const auto& pair : gateMap) {
 		int gateId = pair.first;
 		int gateTypeId = pair.second->GetTypeID();
 		serializedGates <<"{" << gateTypeId << "," << gateId << ",}";
@@ -86,4 +86,16 @@ std::string GateStore::SerializeGates() const
 	serializedGates << "]";
 
 	return serializedGates.str();
+}
+
+const std::vector<int>& GateStore::GetGatesData() const
+{
+	std::vector<int> sequentialData;
+	for (const auto& pair : gateMap) {
+		sequentialData.push_back(pair.first);
+		sequentialData.push_back(pair.second->GetTypeID());
+		sequentialData.push_back(pair.second->GetNumberOfInputs());
+		sequentialData.push_back((int)pair.second->GetLastOutput().size());
+	}
+	return sequentialData;
 }

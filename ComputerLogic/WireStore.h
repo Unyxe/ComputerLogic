@@ -24,5 +24,7 @@ public:
 	void SetWiresStateByInput(int inputObjectID, int index, bool state);
 
 	std::string SerializeWires() const;
+
+	const std::vector<int>& GetWiresData() const;
 };
 

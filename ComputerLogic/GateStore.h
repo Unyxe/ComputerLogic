@@ -10,7 +10,7 @@
 class GateStore
 {
 private:
-	std::unordered_map<int, std::unique_ptr<Gate>> GateMap;
+	std::unordered_map<int, std::unique_ptr<Gate>> gateMap;
 
 public:
 	GateStore() = default;
@@ -20,12 +20,14 @@ public:
 	int EmplaceGate(int gateTypeId, int gateId);
 	void RemoveGate(int gateId);
 
-	std::vector<int> GetAllGateIds() const;
+	const std::vector<int>& GetAllGateIds() const;
 
 	std::vector<bool> EvaluateGate(int gateId, const std::vector<bool>& input);
 	std::vector<bool> GetLastOutput(int gateId) const;
 	int GetNumberOfInputs(int gateId) const;
 
 	std::string SerializeGates() const;
+
+	const std::vector<int>& GetGatesData() const;
 };
 

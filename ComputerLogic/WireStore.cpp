@@ -60,3 +60,17 @@ std::string WireStore::SerializeWires() const
 
 	return serializedWires.str();
 }
+
+const std::vector<int>& WireStore::GetWiresData() const
+{
+	std::vector<int> sequentialData;
+	for (const auto& wire : wireMap) {
+		sequentialData.push_back(wire.first);
+		sequentialData.push_back(wire.second->GetState());
+		sequentialData.push_back(wire.second->GetObjId1());
+		sequentialData.push_back(wire.second->GetObjId2());
+		sequentialData.push_back(wire.second->GetIndex1());
+		sequentialData.push_back(wire.second->GetIndex2());
+	}
+	return sequentialData;
+}

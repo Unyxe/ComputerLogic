@@ -77,6 +77,16 @@ void CircuitManager::RemoveWire(int objId1, int objId2, int index1, int index2)
 	wireStore->RemoveWire(objId1, objId2, index1, index2);
 }
 
+const std::vector<int>& CircuitManager::GetGatesData() const
+{
+	return gateStore->GetGatesData();
+}
+
+const std::vector<int>& CircuitManager::GetWiresData() const
+{
+	return wireStore->GetWiresData();
+}
+
 void CircuitManager::ClearCircuit(int numberOfInputs, int numberOfOutputs)
 {
 	inputStates.clear();
