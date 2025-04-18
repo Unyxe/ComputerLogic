@@ -31,6 +31,9 @@ Gate::Gate(std::string_view serializedGate)
 	inputsID = data[3];
 	outputsID = data[4];
 
+	for (int i = 0; i < numberOfInputs; i++) {
+		lastInput.push_back(false);
+	}
 	for (int i = 0; i < numberOfOutputs; i++) {
 		lastOutput.push_back(false);
 	}
@@ -76,6 +79,7 @@ std::vector<bool> Gate::Evaluate(const std::vector<bool>& input)
 	}
 
 	lastOutput = outputStates;
+	lastInput = input;
 
 	return outputStates;
 }

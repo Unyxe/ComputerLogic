@@ -68,18 +68,21 @@ std::string WireStore::SerializeWires() const
 	return StaticGateLibrary::SerializeIntVector(data);
 }
 
-const std::vector<int> WireStore::GetWiresData() const
+const std::vector<WireRenderData> WireStore::GetWiresData() const
 {
-	std::vector<int> sequentialData;
+	std::vector<WireRenderData> renderDataCollection;
 	for (const auto& wire : wireMap) {
-		sequentialData.push_back(wire.first);
-		sequentialData.push_back(wire.second->GetState());
-		sequentialData.push_back(wire.second->GetObjId1());
-		sequentialData.push_back(wire.second->GetObjId2());
-		sequentialData.push_back(wire.second->GetIndex1());
-		sequentialData.push_back(wire.second->GetIndex2());
+		WireRenderData wireRenderData;
+		wireRenderData.wireId = wire.first;
+		wireRenderData.wireState = wire.second->GetState();
+		wireRenderData.startGateId = wire.second->GetObjId1();
+		wireRenderData.endGateId = wire.second->GetObjId2();
+		wireRenderData.startGateIndex = wire.second->GetIndex1();
+		wireRenderData.endGateIndex = wire.second->GetIndex2();
+
+		renderDataCollection.push_back(wireRenderData);
 	}
-	return sequentialData;
+	return renderDataCollection;
 }
 
 std::vector<int> WireStore::OverwriteWiresByParsed(std::vector<int> data, int start)

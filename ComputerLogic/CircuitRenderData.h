@@ -2,27 +2,24 @@
 
 #include <vector>
 
+#include "GateRenderData.h"
+#include "WireRenderData.h"
+
 class CircuitRenderData
 {
-private:
-	std::vector<int> sequentialGateData;
-	std::vector<int> sequentialWireData;
+public:
+	CircuitRenderData() = default;
+
+	std::vector<GateRenderData> gateData;
+	std::vector<WireRenderData> wireData;
 
 	int numberOfInputs = 0;
 	int numberOfOutputs = 0;
 
+	std::vector<bool> inputStates;
+	std::vector<bool> outputStates;
+
 	int inputId = 0;
 	int outputId = 0;
-
-public:
-	CircuitRenderData() = default;
-	CircuitRenderData(const std::vector<int>& sequentialGateData, const std::vector<int>& sequentialWireData, int numberOfInputs, int numberOfOutputs, int inputId, int outputId) : sequentialGateData(sequentialGateData), sequentialWireData(sequentialWireData), numberOfInputs(numberOfInputs), numberOfOutputs(numberOfOutputs), inputId(inputId), outputId(outputId) {};
-
-	const std::vector<int>& GetSequentialGateData() const { return sequentialGateData; };
-	const std::vector<int>& GetSequentialWireData() const { return sequentialWireData; };
-	int GetNumberOfInputs() const { return numberOfInputs; };
-	int GetNumberOfOutputs() const { return numberOfOutputs; };
-	int GetInputId() const { return inputId; };
-	int GetOutputId() const { return outputId; };
 };
 

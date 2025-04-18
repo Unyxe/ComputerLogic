@@ -23,14 +23,17 @@ protected:
 
 	void ChangeTypeID(int newTypeID) { typeID = newTypeID; }
 	
+	std::vector<bool> lastInput;
 	std::vector<bool> lastOutput;
 public:
 	Gate();
 	explicit Gate(std::string_view serializedGate);
 	virtual ~Gate();
 	virtual std::vector<bool> Evaluate(const std::vector<bool>& input);
-	std::vector<bool> GetLastOutput() const { return lastOutput; }
+	const std::vector<bool> GetLastInput() const { return lastInput; }
+	const std::vector<bool> GetLastOutput() const { return lastOutput; }
 	int GetNumberOfInputs() const { return numberOfInputs; }
+	int GetNumberOfOutputs() const { return numberOfOutputs; }
 	int GetTypeID() const { return typeID; }
 };
 

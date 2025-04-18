@@ -7,6 +7,19 @@ class DrawingHelper
 {
 
 public:
+
+	static sf::Vector2f RotatePoint(sf::Vector2f point, float angle) {
+		float cosAngle = cos(angle);
+		float sinAngle = sin(angle);
+		return sf::Vector2f(
+			point.x * cosAngle - point.y * sinAngle,
+			point.x * sinAngle + point.y * cosAngle
+		);
+	};
+	static float Sign(float x) {
+		return x / fabs(x);
+	}
+
 	static void DrawStateCircle(sf::RenderWindow& window, const sf::Vector2f& position, bool state)
 	{
 		sf::CircleShape outline(12);
@@ -95,9 +108,31 @@ public:
 
 	static std::vector<sf::Vector2f> GenerateCircleTurnsCurves(const std::vector<sf::Vector2f> points, float radius) {
 		std::vector<sf::Vector2f> curves;
-		for (size_t i = 0; i < points.size(); ++i) {
-			
+		curves.push_back(points[0]);
+		for (size_t i = 2; i < points.size(); i++) {
+			auto vecA = points[i - 1] - points[i - 2];
+			auto vecB = points[i] - points[i - 2];
+			float angle = atan2f(vecA.y, vecA.x);
+			auto RvecA = RotatePoint(vecA, -angle);
+			auto RvecB = RotatePoint(vecB, -angle);
+			auto vecD = RvecB - RvecA;
+			float angle2 = atan2f(vecD.y, vecD.x);
+			auto vecCrot = sf::Vector2f(-Sign(vecD.y)*radius*tanf(angle2/2) + RvecA.x, Sign(vecD.y) * radius);
+			auto vecC = RotatePoint(vecCrot, angle) + points[i-2];
+
+			float startAngle = angle;
+			if (angle2 < 0) {
+				startAngle += 3.14159f;
+			}
+			for (int j = 0; j < 32; j++) {
+				float t = static_cast<float>(j) / 32.f * angle2 + startAngle;
+				curves.push_back(sf::Vector2f(
+					vecC.x + radius * sin(t),
+					vecC.y - radius * cos(t)
+				));
+			}
 		}
+		curves.push_back(points[points.size() - 1]);
 		return curves;
 	}
 };

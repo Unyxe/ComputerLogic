@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "StaticGateLibrary.h"
-#include "DrawingHelper.h";
+#include "DrawingHelper.h"
 
 void RenderManager::pollEvents()
 {
@@ -22,11 +22,11 @@ void RenderManager::Draw()
 		drawableWire.second->Draw(renderWindow);
 	}
 
-	for (int i = 0; i < currentRenderData.GetNumberOfInputs(); i++) {
+	for (int i = 0; i < currentRenderData.numberOfInputs; i++) {
 		DrawingHelper::DrawStateCircle(renderWindow, inputPositions[i], false);
 	}
 
-	for (int i = 0; i < currentRenderData.GetNumberOfOutputs(); i++) {
+	for (int i = 0; i < currentRenderData.numberOfOutputs; i++) {
 		DrawingHelper::DrawStateCircle(renderWindow, outputPositions[i], false);
 	}
 
@@ -66,8 +66,8 @@ void RenderManager::PopulateDrawables()
 	inputPositions.clear();
 
 
-	int inputCount = currentRenderData.GetNumberOfInputs();
-	int outputCount = currentRenderData.GetNumberOfOutputs();
+	int inputCount = currentRenderData.numberOfInputs;
+	int outputCount = currentRenderData.numberOfOutputs;
 
 	for (int i = 0; i < inputCount; i++) {
 		inputPositions.push_back({ 50.f, 50.f + (WINDOW_HEIGHT-100.f)*(i+1)/(inputCount+1)});
@@ -76,45 +76,32 @@ void RenderManager::PopulateDrawables()
 		outputPositions.push_back({ WINDOW_WIDTH - 50.f, 50.f + (WINDOW_HEIGHT - 100.f) * (i+1) / (outputCount+1) });
 	}
 
-	for (const auto& gateData : SplitVector(currentRenderData.GetSequentialGateData(), 6))
+	for (const auto& gateData : currentRenderData.gateData)
 	{
-		int gateId = gateData[0];
-		int gateTypeId = gateData[1];
-		int numberOfInputs = gateData[2];
-		int numberOfOutputs = gateData[3];
-		int x = gateData[4];
-		int y = gateData[5];
-		drawableGateMap[gateId] = std::make_unique<DrawableGate>(gateId, gateTypeId, numberOfInputs, numberOfOutputs);
-		drawableGateMap[gateId]->SetPosition({ (float)x, (float)y });
+		drawableGateMap[gateData.gateId] = std::make_unique<DrawableGate>(gateData);
 	}
-	for (const auto& wireData : SplitVector(currentRenderData.GetSequentialWireData(), 6))
+	for (const auto& wireData : currentRenderData.wireData)
 	{
-		int wireId = wireData[0];
-		int wireState = wireData[1];
-		int startGateId = wireData[2];
-		int endGateId = wireData[3];
-		int startGateIndex = wireData[4];
-		int endGateIndex = wireData[5];
-		drawableWireMap[wireId] = std::make_unique<DrawableWire>(wireId, wireState);
+		drawableWireMap[wireData.wireId] = std::make_unique<DrawableWire>(wireData);
 
 		sf::Vector2f pos1;
 		sf::Vector2f pos2;
 
-		if (startGateId == currentRenderData.GetInputId()) {
-			pos1 = inputPositions[startGateIndex];
+		if (wireData.startGateId == currentRenderData.inputId) {
+			pos1 = inputPositions[wireData.startGateIndex];
 		}
 		else {
-			pos1 = drawableGateMap[startGateId]->GetOutputPosition(startGateIndex);
+			pos1 = drawableGateMap[wireData.startGateId]->GetOutputPosition(wireData.startGateIndex);
 		}
 
-		if (endGateId == currentRenderData.GetOutputId()) {
-			pos2 = outputPositions[endGateIndex];
+		if (wireData.endGateId == currentRenderData.outputId) {
+			pos2 = outputPositions[wireData.endGateIndex];
 		}
 		else {
-			pos2 = drawableGateMap[endGateId]->GetInputPosition(endGateIndex);
+			pos2 = drawableGateMap[wireData.endGateId]->GetInputPosition(wireData.endGateIndex);
 		}
 
-		drawableWireMap[wireId]->SetPosition(
+		drawableWireMap[wireData.wireId]->SetPosition(
 			pos1,pos2
 		);
 	}

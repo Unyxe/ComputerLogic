@@ -2,16 +2,13 @@
 
 #include "DrawingHelper.h"
 
-DrawableWire::DrawableWire(int wireId, bool state)
+DrawableWire::DrawableWire(WireRenderData data)
 {
-	this->wireId = wireId;
-	this->state = state;
-
+	wireId = data.wireId;
+	state = data.wireState;
 	wireActiveColor = sf::Color::Green;
 	wireInactiveColor = sf::Color::Red;
-	width = 5.0f; // Default width
-	position1 = { 0.0f, 0.0f };
-	position2 = { 0.0f, 0.0f };
+	width = data.width;
 }
 
 void DrawableWire::Draw(sf::RenderWindow& window) const
@@ -28,9 +25,10 @@ void DrawableWire::Draw(sf::RenderWindow& window) const
 
 	std::vector<sf::Vector2f> points = {
 		position1,
-		sf::Vector2f((2*position1.x+position2.x)/3, position1.y),
-		sf::Vector2f((position1.x + 2*position2.x) / 3, position2.y),
+		{(position1.x + position2.x) / 2, position1.y},
+		{(position1.x + position2.x) / 2, position2.y},
 		position2
 	};
-	DrawingHelper::DrawWire(window, DrawingHelper::GenerateCircleTurnsCurves(points, 5), 3, state ? wireActiveColor : wireInactiveColor);
+	auto c = DrawingHelper::GenerateCircleTurnsCurves(points, 30);
+	DrawingHelper::DrawWire(window, c , 3, state ? wireActiveColor : wireInactiveColor);
 }

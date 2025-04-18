@@ -4,6 +4,9 @@
 #include "GateStore.h"
 #include "WireStore.h"
 
+#include "WireRenderData.h"
+#include "GateRenderData.h"
+
 class CircuitManager
 {
 private:
@@ -50,8 +53,8 @@ public:
 	int GetInputsID() const { return inputsID; }
 	int GetOutputsID() const { return outputsID; }
 
-	const std::vector<int> GetGatesData() const;
-	const std::vector<int> GetWiresData() const;
+	const std::vector<GateRenderData> GetGatesData() const;
+	const std::vector<WireRenderData> GetWiresData() const;
 
 	void ClearCircuit(int numberOfInputs, int numberofOutputs);
 	void LoadCircuit(std::string_view serializedCircuit);

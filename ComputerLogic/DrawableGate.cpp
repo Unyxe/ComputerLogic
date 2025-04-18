@@ -2,20 +2,24 @@
 
 #include "DrawingHelper.h"
 
-
-DrawableGate::DrawableGate(int gateId, int gateTypeId, int gateInputCount, int gateOutputCount)
+DrawableGate::DrawableGate(GateRenderData data)
 {
-	this->gateId = gateId;
-	this->gateType = gateTypeId;
-	this->gateInputCount = gateInputCount;
-	this->gateOutputCount = gateOutputCount;
-
-
-	// Set default size and color
+	this->gateId = data.gateId;
+	this->gateType = data.gateTypeId;
+	this->gateInputCount = data.numberOfInputs;
+	this->gateOutputCount = data.numberOfOutputs;
 	size = { 125.0f, 80.0f };
 	gateColor = sf::Color::Color(203, 107, 46);
-	// Set default position
-	position = { 0.0f, 0.0f };
+	position = sf::Vector2f( data.x, data.y );
+
+	inputStates.resize(gateInputCount);
+	outputStates.resize(gateOutputCount);
+	for (int i = 0; i < gateInputCount; i++) {
+		inputStates[i] = data.inputStates[i];
+	}
+	for (int i = 0; i < gateOutputCount; i++) {
+		outputStates[i] = data.outputStates[i];
+	}
 }
 
 void DrawableGate::Draw(sf::RenderWindow& window) const
@@ -29,14 +33,14 @@ void DrawableGate::Draw(sf::RenderWindow& window) const
 		float x = position.x - size.x / 2;
 		float y = position.y - size.y / 2 + (size.y / (gateInputCount + 1)) * (i + 1);
 
-		DrawingHelper::DrawStateCircle(window, { x, y }, false);
+		DrawingHelper::DrawStateCircle(window, { x, y }, inputStates[i]);
 	}
 
 	for (int i = 0; i < gateOutputCount; i++) {
 		float x = position.x + size.x / 2;
 		float y = position.y - size.y / 2 + (size.y / (gateOutputCount + 1)) * (i + 1);
 
-		DrawingHelper::DrawStateCircle(window, { x, y }, false);
+		DrawingHelper::DrawStateCircle(window, { x, y }, outputStates[i]);
 	}
 }
 

@@ -4,7 +4,14 @@
 
 const CircuitRenderData ApplicationManager::GetCircuitRenderData()
 {
-	return CircuitRenderData(circuitManager->GetGatesData(), circuitManager->GetWiresData(), (int)circuitManager->GetInputStates().size(), (int)circuitManager->GetOutputStates().size(), circuitManager->GetInputsID(), circuitManager->GetOutputsID());
+	CircuitRenderData circuitRenderData;
+	circuitRenderData.gateData = circuitManager->GetGatesData();
+	circuitRenderData.wireData = circuitManager->GetWiresData();
+	circuitRenderData.numberOfInputs = circuitManager->GetInputStates().size();
+	circuitRenderData.numberOfOutputs = circuitManager->GetOutputStates().size();
+	circuitRenderData.inputId = circuitManager->GetInputsID();
+	circuitRenderData.outputId = circuitManager->GetOutputsID();
+	return circuitRenderData;
 }
 
 void ApplicationManager::CircuitThread()

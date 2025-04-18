@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "GateRenderData.h"
+
 class DrawableGate
 {
 private:
@@ -10,12 +12,15 @@ private:
 	int gateInputCount;
 	int gateOutputCount;
 
+	std::vector<bool> inputStates;
+	std::vector<bool> outputStates;
+
 	sf::Color gateColor;
 	
 	sf::Vector2f position;
 	sf::Vector2f size;
 public:
-	DrawableGate(int gateId, int gateTypeId, int gateInputCount, int gateOutputCount);
+	DrawableGate(GateRenderData data);
 
 	void Draw(sf::RenderWindow& window) const;
 	

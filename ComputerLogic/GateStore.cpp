@@ -121,17 +121,23 @@ int GateStore::OverwriteGatesByParsed(std::vector<int> data, int start)
 	return start;
 }
 
-const std::vector<int> GateStore::GetGatesData() const
+const std::vector<GateRenderData> GateStore::GetGatesData() const
 {
-	std::vector<int> sequentialData;
+	std::vector<GateRenderData> renderDataCollection;
 	for (const auto& pair : gateMap) {
-		sequentialData.push_back(pair.first);
-		sequentialData.push_back(pair.second->GetTypeID());
-		sequentialData.push_back(pair.second->GetNumberOfInputs());
-		sequentialData.push_back((int)pair.second->GetLastOutput().size());
+		GateRenderData renderData;
+		renderData.gateId = pair.first;
+		renderData.gateTypeId = pair.second->GetTypeID();
+		renderData.numberOfInputs = pair.second->GetNumberOfInputs();
+		renderData.numberOfOutputs = pair.second->GetNumberOfOutputs();
+		renderData.inputStates = pair.second->GetLastInput();
+		renderData.outputStates = pair.second->GetLastOutput();
+
 		auto& metaData = gateMetaDataMap.at(pair.first)->GetData();
-		sequentialData.push_back(metaData[0]);
-		sequentialData.push_back(metaData[1]);
+		renderData.x = metaData[0];
+		renderData.y = metaData[1];
+
+		renderDataCollection.push_back(renderData);
 	}
-	return sequentialData;
+	return renderDataCollection;
 }

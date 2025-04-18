@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Wire.h"
+#include "WireRenderData.h"
 
 class WireStore
 {
@@ -25,7 +26,7 @@ public:
 
 	std::string SerializeWires() const;
 
-	const std::vector<int> GetWiresData() const;
+	const std::vector<WireRenderData> GetWiresData() const;
 
 	std::vector<int> OverwriteWiresByParsed(std::vector<int> data, int start);
 };

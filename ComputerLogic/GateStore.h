@@ -7,6 +7,7 @@
 
 #include "Gate.h"
 #include "GateMetaData.h"
+#include "GateRenderData.h"
 
 class GateStore
 {
@@ -32,6 +33,6 @@ public:
 
 	int OverwriteGatesByParsed(std::vector<int> data, int start);
 
-	const std::vector<int> GetGatesData() const;
+	const std::vector<GateRenderData> GetGatesData() const;
 };
 

@@ -82,12 +82,12 @@ void CircuitManager::RemoveWire(int objId1, int objId2, int index1, int index2)
 	wireStore->RemoveWire(objId1, objId2, index1, index2);
 }
 
-const std::vector<int> CircuitManager::GetGatesData() const
+const std::vector<GateRenderData> CircuitManager::GetGatesData() const
 {
 	return gateStore->GetGatesData();
 }
 
-const std::vector<int> CircuitManager::GetWiresData() const
+const std::vector<WireRenderData> CircuitManager::GetWiresData() const
 {
 	return wireStore->GetWiresData();
 }

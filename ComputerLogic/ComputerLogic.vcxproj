@@ -151,12 +151,14 @@
     <ClCompile Include="DrawingHelper.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="GateMetaData.cpp" />
+    <ClCompile Include="GateRenderData.cpp" />
     <ClCompile Include="GateStore.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PrimitiveGate.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="StaticGateLibrary.cpp" />
     <ClCompile Include="Wire.cpp" />
+    <ClCompile Include="WireRenderData.cpp" />
     <ClCompile Include="WireStore.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,11 +170,13 @@
     <ClInclude Include="DrawingHelper.h" />
     <ClInclude Include="Gate.h" />
     <ClInclude Include="GateMetaData.h" />
+    <ClInclude Include="GateRenderData.h" />
     <ClInclude Include="GateStore.h" />
     <ClInclude Include="PrimitiveGate.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="StaticGateLibrary.h" />
     <ClInclude Include="Wire.h" />
+    <ClInclude Include="WireRenderData.h" />
     <ClInclude Include="WireStore.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
