@@ -64,7 +64,41 @@ public:
 	};
 
 	static void DrawWire(sf::RenderWindow& window, const std::vector<sf::Vector2f> points, float wireThickness, const sf::Color& wireColor) {
-		
+		sf::VertexArray wire(sf::PrimitiveType::TriangleStrip , points.size() * 4 - 4);
+		for (size_t i = 1; i < points.size(); ++i) {
+			auto vecA = points[i]-points[i-1];
+			auto vecN = sf::Vector2f(-vecA.y*wireThickness/sqrt(vecA.y*vecA.y + vecA.x*vecA.x), vecA.x * wireThickness / sqrt(vecA.y * vecA.y + vecA.x * vecA.x));
+			wire[4*i-4] = sf::Vertex{ points[i-1] + vecN, wireColor };
+			wire[4 * i - 3] = sf::Vertex{ points[i - 1] - vecN, wireColor };
+			wire[4 * i - 2] = sf::Vertex{ points[i] + vecN, wireColor };
+			wire[4*i-1] = sf::Vertex{ points[i] - vecN, wireColor };
+		}
+		window.draw(wire);
 	};
+
+
+	static std::vector<sf::Vector2f> GenerateBezierCurve(const sf::Vector2f& start, const sf::Vector2f& end, const sf::Vector2f& control1, const sf::Vector2f& control2, int numPoints)
+	{
+		std::vector<sf::Vector2f> points;
+		points.reserve(numPoints);
+		for (int i = 0; i <= numPoints; ++i) {
+			float t = static_cast<float>(i) / static_cast<float>(numPoints);
+			float u = 1 - t;
+			sf::Vector2f point = u * u * u * start +
+				3 * u * u * t * control1 +
+				3 * u * t * t * control2 +
+				t * t * t * end;
+			points.push_back(point);
+		}
+		return points;
+	};
+
+	static std::vector<sf::Vector2f> GenerateCircleTurnsCurves(const std::vector<sf::Vector2f> points, float radius) {
+		std::vector<sf::Vector2f> curves;
+		for (size_t i = 0; i < points.size(); ++i) {
+			
+		}
+		return curves;
+	}
 };
 
